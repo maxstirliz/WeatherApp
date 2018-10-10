@@ -1,0 +1,36 @@
+package lymansky.artem.weatherapp.utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class TimeUtils {
+    private static final int HOUR_OFFSET = 3;
+    private static final int SECONDS_OFFSET = HOUR_OFFSET * 60 * 60;
+
+    private static final String FULL_DATE_FORMAT = "EE, dd MMMM";
+    private static final String WEEK_DAY_FORMAT = "EE";
+    private static final String HOUR_FORMAT = "HH";
+
+    public static long convertToLocal(long utcTime) {
+        return (utcTime + SECONDS_OFFSET) * 1000L;
+    }
+
+    public static String getFullDateFormat(long utcTime) {
+        Date date = new Date(convertToLocal(utcTime));
+        SimpleDateFormat format = new SimpleDateFormat(FULL_DATE_FORMAT, Locale.getDefault());
+        return format.format(date);
+    }
+
+    public static String getWeekDayFormat(long utcTime) {
+        Date date = new Date(convertToLocal(utcTime));
+        SimpleDateFormat format = new SimpleDateFormat(WEEK_DAY_FORMAT, Locale.getDefault());
+        return format.format(date);
+    }
+
+    public static String getHourFormat(long utcTime) {
+        Date date = new Date(convertToLocal(utcTime));
+        SimpleDateFormat format = new SimpleDateFormat(HOUR_FORMAT, Locale.getDefault());
+        return format.format(date);
+    }
+}
