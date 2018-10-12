@@ -1,24 +1,27 @@
-package lymansky.artem.weatherapp;
+package lymansky.artem.weatherapp.fragments;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import lymansky.artem.weatherapp.data.WeatherData;
+import java.util.List;
+
+import lymansky.artem.weatherapp.R;
+import lymansky.artem.weatherapp.db.WeatherEntry;
+import lymansky.artem.weatherapp.utils.IconUtils;
 import lymansky.artem.weatherapp.utils.TimeUtils;
 
 public class WeatherDetailFragment extends Fragment {
 
-    private Context mContext;
+    private List<WeatherEntry> mEntries;
 
     private TextView mCityName;
     private TextView mFullDate;
@@ -26,41 +29,49 @@ public class WeatherDetailFragment extends Fragment {
     private TextView mHumidity;
     private TextView mWindSpeed;
     private ImageView mWeatherPic;
+    private ImageView mWindDirectionPic;
 
-    public WeatherDetailFragment() {}
+    public WeatherDetailFragment() {
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_detail_fragment, container, false);
-        bindViews(view);
+        initViews(view);
+        bindData(mEntries);
 
 
-        //DUMMY DATA
+        //TODO: city name, last update time, etc. to and from SharedPreferences;
         mCityName.setText("Zaporizhzhia");
-        mFullDate.setText(TimeUtils.getFullDateFormat(System.currentTimeMillis()));
-        String temp = getString(R.string.df_temperature_range, 27, 17);
-        mTemperature.setText(temp);
-        String humid = getString(R.string.df_humidity, 45);
-        mHumidity.setText(humid);
-        String windSp = getString(R.string.df_wind_speed, 10);
-        mWindSpeed.setText(windSp);
 
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mContext = context;
+    public void setEntries(List<WeatherEntry> entries) {
+        mEntries = entries;
     }
 
-    private void bindViews(View view) {
+    private void initViews(View view) {
         mCityName = view.findViewById(R.id.city_name);
         mFullDate = view.findViewById(R.id.tv_full_date);
         mTemperature = view.findViewById(R.id.tv_temperature);
         mHumidity = view.findViewById(R.id.tv_humidity);
         mWindSpeed = view.findViewById(R.id.tv_wind_speed);
         mWeatherPic = view.findViewById(R.id.ic_weather_pic);
+        mWindDirectionPic = view.findViewById(R.id.ic_wind_direction);
+    }
+
+    private void bindData(List<WeatherEntry> entries) {
+        WeatherEntry e = entries.get(21);
+
+        mFullDate.setText(TimeUtils.getFullDateFormat(e.getTime()));
+        String temp = getString(R.string.df_temperature_range, e.getTempMax(), e.getTempMin());
+        mTemperature.setText(temp);
+        mHumidity.setText(getString(R.string.df_humidity, e.getHumidity()));
+        mWindSpeed.setText(getString(R.string.df_wind_speed, e.getWind()));
+        mWindDirectionPic.setImageResource(IconUtils.getWindDirectionResource(e.getWindDirection()));
+        mWeatherPic.setImageResource(IconUtils.getIconResource(e.getPic()));
+
     }
 }

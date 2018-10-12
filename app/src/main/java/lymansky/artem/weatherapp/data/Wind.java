@@ -2,19 +2,19 @@ package lymansky.artem.weatherapp.data;
 
 import com.google.gson.annotations.SerializedName;
 
-class Wind {
+public class Wind {
 
     @SerializedName("speed")
-    int speed; // in mps
+    double speed; // in mps
 
     @SerializedName("deg")
-    int degrees;
+    double degrees;
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
-    public int getDegrees() {
+    public double getDegrees() {
         return degrees;
     }
 }

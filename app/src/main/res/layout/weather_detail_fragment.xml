@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/tv_full_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -68,9 +68,9 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
-        android:background="@drawable/ic_white_day_cloudy"
+        tools:background="@drawable/ic_white_day_cloudy"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_full_date" />
 
     <ImageView
         android:id="@+id/ic_temperature"
@@ -149,7 +149,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:background="@drawable/ic_arrow_up"
+        tools:background="@drawable/ic_arrow_up"
         app:layout_constraintBottom_toTopOf="@+id/tv_wind_speed"
         app:layout_constraintStart_toEndOf="@+id/tv_wind_speed"
         app:layout_constraintTop_toBottomOf="@+id/tv_wind_speed" />

@@ -2,37 +2,54 @@ package lymansky.artem.weatherapp.db;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "weather")
 public class WeatherEntry {
 
     @PrimaryKey
-    private int time;
-
+    @ColumnInfo(name = "time")
+    private long time;
     @ColumnInfo(name = "day_number")
     private int dayNumber;
-
+    @ColumnInfo(name = "pic")
     private String pic;
-
+    @ColumnInfo(name = "temp")
     private int temp;
-
     @ColumnInfo(name = "temp_max")
     private int tempMax;
     @ColumnInfo(name = "temp_min")
     private int tempMin;
-
+    @ColumnInfo(name = "humidity")
     private int humidity;
-
+    @ColumnInfo(name = "wind")
     private int wind;
     @ColumnInfo(name = "wind_direction")
     private int windDirection;
 
-    public int getTime() {
+    @Ignore
+    public WeatherEntry() {}
+
+    public WeatherEntry(long time, int dayNumber, String pic, int temp, int tempMax, int tempMin, int humidity, int wind, int windDirection) {
+        this.time = time;
+        this.dayNumber = dayNumber;
+        this.pic = pic;
+        this.temp = temp;
+        this.tempMax = tempMax;
+        this.tempMin = tempMin;
+        this.humidity = humidity;
+        this.wind = wind;
+        this.windDirection = windDirection;
+    }
+
+
+    //Getters and Setters
+    public long getTime() {
         return time;
     }
 
-    public void setTime(int time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

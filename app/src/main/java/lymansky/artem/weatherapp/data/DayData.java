@@ -2,19 +2,21 @@ package lymansky.artem.weatherapp.data;
 
 import com.google.gson.annotations.SerializedName;
 
-class DayData {
+import java.util.List;
+
+public class DayData {
 
     @SerializedName("dt")
-    long date; //Unix, UTC
+    private long date; //Unix, UTC
 
     @SerializedName("main")
-    MainData mainData;
+    private MainData mainData;
 
     @SerializedName("weather")
-    Weather[] weather;
+    private List<Weather> weather;
 
     @SerializedName("wind")
-    Wind wind;
+    private Wind wind;
 
     public long getDate() {
         return date;
@@ -24,8 +26,8 @@ class DayData {
         return mainData;
     }
 
-    public Weather[] getWeather() {
-        return weather;
+    public Weather getWeather() {
+        return weather.get(0);
     }
 
     public Wind getWind() {

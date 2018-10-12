@@ -2,24 +2,18 @@ package lymansky.artem.weatherapp.data;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class WeatherData {
 
-    @SerializedName("cod")
-    int cod;
 
     @SerializedName("list")
-    ArrayList<DayData> list;
+    private List<DayData> list;
 
     @SerializedName("city")
-    City cityInfo;
+    private City cityInfo;
 
-    public int getCod() {
-        return cod;
-    }
-
-    public ArrayList<DayData> getList() {
+    public List<DayData> getList() {
         return list;
     }
 

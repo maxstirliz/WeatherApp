@@ -2,40 +2,40 @@ package lymansky.artem.weatherapp.data;
 
 import com.google.gson.annotations.SerializedName;
 
-class MainData {
+public class MainData {
 
     @SerializedName("temp")
-    int tempAverage;
+    double tempAverage;
 
     @SerializedName("pressure")
-    int pressure; //in hPa
+    double pressure; //in hPa
 
     @SerializedName("humidity")
-    int humidity;
+    double humidity;
 
     @SerializedName("temp_min")
-    int tempMin;
+    double tempMin;
 
     @SerializedName("temp_max")
-    int tempMax;
+    double tempMax;
 
-    public int getTempAverage() {
+    public double getTempAverage() {
         return tempAverage;
     }
 
-    public int getPressure() {
+    public double getPressure() {
         return pressure;
     }
 
-    public int getHumidity() {
+    public double getHumidity() {
         return humidity;
     }
 
-    public int getTempMin() {
+    public double getTempMin() {
         return tempMin;
     }
 
-    public int getTempMax() {
+    public double getTempMax() {
         return tempMax;
     }
 }
