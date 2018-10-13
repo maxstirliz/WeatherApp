@@ -1,30 +1,44 @@
 package lymansky.artem.weatherapp;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import java.util.List;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.concurrent.TimeUnit;
 
 import lymansky.artem.weatherapp.adapters.DailyWeatherAdapter;
-import lymansky.artem.weatherapp.data.WeatherData;
-import lymansky.artem.weatherapp.db.WeatherEntry;
 import lymansky.artem.weatherapp.fragments.DailyWeatherFragment;
-import lymansky.artem.weatherapp.fragments.WeatherDataViewModel;
 import lymansky.artem.weatherapp.fragments.WeatherDetailFragment;
-import lymansky.artem.weatherapp.network.Client;
-import lymansky.artem.weatherapp.network.Service;
-import lymansky.artem.weatherapp.utils.Constants;
-import lymansky.artem.weatherapp.utils.WeatherDataUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import lymansky.artem.weatherapp.services.UpdateRoomService;
+import lymansky.artem.weatherapp.utils.AutoUpdateUtils;
 
-public class MainActivity extends AppCompatActivity implements DailyWeatherAdapter.OnItemClick {
+public class MainActivity extends AppCompatActivity implements DailyWeatherAdapter.OnItemClick,
+        WeatherDetailFragment.OnLocationPickerListener {
 
-    private WeatherDataViewModel mViewModel;
+    public static final String EXTRA_CITY_NAME = "city-name-extra";
+    public static final String EXTRA_CITY_LAT = "city-latitude-extra";
+    public static final String EXTRA_CITY_LON = "city-longitude-extra";
+
+    private static final int CITY_AUTOCOMPLETE_REQUEST_CODE = 1;
+
+    private static final long UPDATE_HOURS_LIMIT = 1L;
+    private static final long UPDATE_DATABASE_MILLISECONDS =
+            TimeUnit.HOURS.toMillis(UPDATE_HOURS_LIMIT);
+
+    private SharedPreferences mSharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,46 +50,36 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
         }
         DailyWeatherAdapter.setOnItemClickListener(this);
 
-        mViewModel = ViewModelProviders.of(this).get(WeatherDataViewModel.class);
-        WeatherDetailFragment detailFragment = new WeatherDetailFragment();
-        DailyWeatherFragment dailyFragment = new DailyWeatherFragment();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.detail_fragment_container, detailFragment)
-                .add(R.id.daily_fragment_container, dailyFragment)
-                .commit();
+        if (savedInstanceState == null) {
+            WeatherDetailFragment detailFragment = new WeatherDetailFragment();
+            DailyWeatherFragment dailyFragment = new DailyWeatherFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.detail_fragment_container, detailFragment)
+                    .add(R.id.daily_fragment_container, dailyFragment)
+                    .commit();
 
+            AutoUpdateUtils.scheduleWeatherUpdater(this);
+        }
 
-        //TODO: put this request into some networking class
-        Client.getService(Service.class).getWeatherByCityName(
-                "Zaporizhzhia",
-                Constants.METRICS_VALUE,
-                Constants.WEATHER_API_KEY)
-                .enqueue(new Callback<WeatherData>() {
-                    @Override
-                    public void onResponse(Call<WeatherData> call, Response<WeatherData> response) {
-                        if (response.body() != null) {
+        mSharedPreferences =
+                getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        long lastUpdateTime = mSharedPreferences.getLong(getString(R.string.last_update_key), 0L);
+        long currentTime = System.currentTimeMillis();
 
-                            final List<WeatherEntry> entries = WeatherDataUtils.convertDataToEntry(response.body());
-                            final List<WeatherEntry> entriesToRemove = WeatherDataUtils.selectLessThan(entries);
-                            //TODO: Probably, IntentService is less memory-leak here
-                            new AsyncTask<Void, Void, Void>() {
-                                @Override
-                                protected Void doInBackground(Void... voids) {
-                                    mViewModel.deleteAllSelected(entriesToRemove);
-                                    mViewModel.insertAll(entries);
-                                    return null;
-                                }
-                            }.execute();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<WeatherData> call, Throwable t) {
-                        Toast.makeText(MainActivity.this, "Connection Error", Toast.LENGTH_SHORT).show();
-                        String throwable = t.getClass().getSimpleName();
-                    }
-                });
+        if (currentTime - lastUpdateTime > UPDATE_DATABASE_MILLISECONDS) {
+            Intent intent = new Intent(this, UpdateRoomService.class);
+            String cityName = mSharedPreferences.getString(getString(R.string.city_name_key),
+                    getString(R.string.default_city_name));
+            float lat = mSharedPreferences.getFloat(getString(R.string.latitude_key),
+                    47.8388F);
+            float lon = mSharedPreferences.getFloat(getString(R.string.longitude_key),
+                    35.1396F);
+            intent.putExtra(EXTRA_CITY_NAME, cityName);
+            intent.putExtra(EXTRA_CITY_LAT, lat);
+            intent.putExtra(EXTRA_CITY_LON, lon);
+            startService(intent);
+        }
     }
 
     @Override
@@ -84,7 +88,48 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
         fragment.setDayToShow(day);
         getSupportFragmentManager()
                 .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .add(R.id.detail_fragment_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onLocationPressed() {
+        try {
+            AutocompleteFilter cityFilter = new AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .build();
+            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                    .setFilter(cityFilter)
+                    .build(this);
+            startActivityForResult(intent, CITY_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            Toast.makeText(this, "GPL disabled or not installed", Toast.LENGTH_SHORT).show();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, "GPL not available", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == CITY_AUTOCOMPLETE_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+
+                LatLng latLng = place.getLatLng();
+                String cityName = place.getName().toString();
+
+                Intent intent = new Intent(this, UpdateRoomService.class);
+                intent.putExtra(EXTRA_CITY_NAME, cityName);
+                intent.putExtra(EXTRA_CITY_LAT, (float) latLng.latitude);
+                intent.putExtra(EXTRA_CITY_LON, (float) latLng.longitude);
+                startService(intent);
+
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Toast.makeText(this, "Error while picking city", Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_CANCELED) {
+
+            }
+        }
     }
 }

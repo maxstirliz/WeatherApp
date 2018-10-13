@@ -2,6 +2,8 @@ package lymansky.artem.weatherapp.fragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,7 +25,7 @@ import lymansky.artem.weatherapp.utils.IconUtils;
 import lymansky.artem.weatherapp.utils.TimeUtils;
 import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
-public class WeatherDetailFragment extends Fragment {
+public class WeatherDetailFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private TextView mCityName;
     private TextView mFullDate;
@@ -32,11 +34,16 @@ public class WeatherDetailFragment extends Fragment {
     private TextView mWindSpeed;
     private ImageView mWeatherPic;
     private ImageView mWindDirectionPic;
+    private ImageView mPlaceIcon;
 
     private int mDayToShow = -1;
     private RecyclerView mRv;
-    HourlyWeatherAdapter mAdapter;
-    LinearLayoutManager mLayoutManger;
+    private WeatherDataViewModel mViewModel;
+    private HourlyWeatherAdapter mAdapter;
+    private LinearLayoutManager mLayoutManger;
+
+    private OnLocationPickerListener mListener;
+    private SharedPreferences mSharedPreferences;
 
     public WeatherDetailFragment() {
     }
@@ -47,30 +54,68 @@ public class WeatherDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.weather_detail_fragment, container, false);
         initViews(view);
 
-        WeatherDataViewModel viewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
-        viewModel.getAllDays().observe(this, new Observer<List<WeatherEntry>>() {
+
+        mViewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
+        mViewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
-                    if(mDayToShow < 0) {
-                        mDayToShow = entries.get(0).getDayNumber();
+                    if (mDayToShow < 0) {
+                        mDayToShow = TimeUtils.getDayNumber(System.currentTimeMillis());
                     }
-                    bindData(entries);
-                    if(mAdapter == null) {
-                        mAdapter = new HourlyWeatherAdapter(WeatherDataUtils.getWeatherOfDay(entries, mDayToShow));
+                    List<WeatherEntry> dayEntries = WeatherDataUtils.getWeatherOfDay(entries, mDayToShow);
+                    bindData(dayEntries);
+                    if (mAdapter == null) {
+                        mAdapter = new HourlyWeatherAdapter(dayEntries);
                         mRv.setAdapter(mAdapter);
                     } else {
-                        mAdapter.setNewData(WeatherDataUtils.getWeatherOfDay(entries, mDayToShow));
+                        mAdapter.setNewData(dayEntries);
                     }
                 }
             }
         });
 
+        String cityName = mSharedPreferences.getString(getString(R.string.city_name_key), "");
+        mCityName.setText(cityName);
 
-        //TODO: city name, last update time, etc. to and from SharedPreferences
-        mCityName.setText("Zaporizhzhia");
+        mPlaceIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onLocationPressed();
+            }
+        });
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mSharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE);
+        if (context instanceof OnLocationPickerListener) {
+            mListener = (OnLocationPickerListener) context;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.city_name_key))) {
+            String cityName = sharedPreferences.getString(getString(R.string.city_name_key), "");
+            mCityName.setText(cityName);
+        }
     }
 
     public void setDayToShow(int day) {
@@ -85,6 +130,8 @@ public class WeatherDetailFragment extends Fragment {
         mWindSpeed = view.findViewById(R.id.tv_wind_speed);
         mWeatherPic = view.findViewById(R.id.ic_weather_pic);
         mWindDirectionPic = view.findViewById(R.id.ic_wind_direction);
+        mPlaceIcon = view.findViewById(R.id.ic_place_picker);
+
         mLayoutManger = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRv = view.findViewById(R.id.rv_hourly_fragment);
         mRv.setHasFixedSize(true);
@@ -92,23 +139,20 @@ public class WeatherDetailFragment extends Fragment {
     }
 
     private void bindData(List<WeatherEntry> entries) {
-        WeatherEntry e;
-        List<WeatherEntry> dayEntries = WeatherDataUtils.getWeatherOfDay(entries, mDayToShow);
-        if(dayEntries.get(0).getTime() > System.currentTimeMillis()) {
-            e = dayEntries.get(0);
-        } else {
-            int index = WeatherDataUtils.getRecentDayTimeIndex(entries, mDayToShow);
-            e = entries.get(index);
-        }
+        WeatherEntry e = entries.get(WeatherDataUtils.getRecentHourIndex(entries));
 
         mFullDate.setText(TimeUtils.getFullDateFormat(e.getTime()));
         String temp = getString(R.string.df_temperature_range,
-                WeatherDataUtils.getMaxTempByDay(entries, mDayToShow),
-                WeatherDataUtils.getMinTempByDay(entries, mDayToShow));
+                WeatherDataUtils.getMaxTemp(entries),
+                WeatherDataUtils.getMinTemp(entries));
         mTemperature.setText(temp);
         mHumidity.setText(getString(R.string.df_humidity, e.getHumidity()));
         mWindSpeed.setText(getString(R.string.df_wind_speed, e.getWind()));
         mWindDirectionPic.setImageResource(IconUtils.getWindDirectionResource(e.getWindDirection()));
         mWeatherPic.setImageResource(IconUtils.getIconResource(e.getPic()));
+    }
+
+    public interface OnLocationPickerListener {
+        void onLocationPressed();
     }
 }

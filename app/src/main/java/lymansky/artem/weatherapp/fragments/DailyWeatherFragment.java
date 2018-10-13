@@ -24,7 +24,8 @@ public class DailyWeatherFragment extends Fragment {
     private DailyWeatherAdapter mAdapter;
 
 
-    public DailyWeatherFragment() {}
+    public DailyWeatherFragment() {
+    }
 
     @Nullable
     @Override
@@ -33,16 +34,17 @@ public class DailyWeatherFragment extends Fragment {
         initViews(view);
 
         WeatherDataViewModel viewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
-        viewModel.getAllDays().observe(this, new Observer<List<WeatherEntry>>() {
+        viewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
 
-                    if(mAdapter == null) {
+                    if (mAdapter == null) {
                         mAdapter = new DailyWeatherAdapter(entries);
                         mRv.setAdapter(mAdapter);
                     } else {
                         mAdapter.setNewData(entries);
+                        mAdapter.notifyDataSetChanged();
                     }
 
                 }
@@ -57,5 +59,6 @@ public class DailyWeatherFragment extends Fragment {
         mRv = view.findViewById(R.id.rv_daily_fragment);
         mRv.setHasFixedSize(true);
         mRv.setLayoutManager(layoutManager);
+        mRv.setItemAnimator(null);
     }
 }

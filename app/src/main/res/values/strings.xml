@@ -10,4 +10,15 @@
     <!--Hourly item-->
     <string name="item_hourly_temp" translatable="false">%1$d\u02DA</string>
 
+    <!--Errors-->
+    <string name="download_error" translatable="true">Error while updating database, type: </string>
+
+    <!--SharedPreference keys and values-->
+    <string name="preference_file_key">lymansky.artem.weatherapp.PREFERENCE_FILE_KEY</string>
+    <string name="city_name_key">city-name-key</string>
+    <string name="last_update_key">last-update-timestamp</string>
+    <string name="latitude_key">latitude-key</string>
+    <string name="longitude_key">longutude-key</string>
+    <string name="default_city_name">Zaporizhzhia</string>
+
 </resources>

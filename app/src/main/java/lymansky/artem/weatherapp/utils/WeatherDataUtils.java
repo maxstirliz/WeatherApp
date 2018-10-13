@@ -1,7 +1,5 @@
 package lymansky.artem.weatherapp.utils;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,40 +144,22 @@ public class WeatherDataUtils {
     }
 
     /**
-     * Returns index of all entries where time is closer to current timestamp
-     * @param allEntries
-     * @param day
+     * Returns entry of an array with the respective hours
+     *
+     * @param entries
      * @return
      */
-    public static int getRecentDayTimeIndex(List<WeatherEntry> allEntries, int day) {
-        List<WeatherEntry> entries = getWeatherOfDay(allEntries, day);
-        long currentTime = System.currentTimeMillis();
-        long distance = Math.abs(entries.get(0).getTime() - currentTime);
+    public static int getRecentHourIndex(List<WeatherEntry> entries) {
+        int currentTime = TimeUtils.getHourInt(System.currentTimeMillis());
+        int distance = Math.abs(TimeUtils.getHourInt(entries.get(0).getTime()) - currentTime);
         int index = 0;
         for (int i = 1; i < entries.size(); ++i) {
-            long iDistance = Math.abs(entries.get(i).getTime() - currentTime);
+            int iDistance = Math.abs(TimeUtils.getHourInt(entries.get(i).getTime()) - currentTime);
             if (iDistance < distance) {
                 index = i;
                 distance = iDistance;
             }
         }
         return index;
-    }
-
-    /**
-     * Returns list of items that have timestamp less than today's earlier timestamp
-     * @param entries
-     * @return
-     */
-    public static List<WeatherEntry> selectLessThan(List<WeatherEntry> entries) {
-        List<WeatherEntry> todays = getWeatherOfDay(entries, TimeUtils.getCurrentDayNumber());
-        long timestamp = todays.get(0).getTime();
-        List<WeatherEntry> selected = new ArrayList<>();
-        for (WeatherEntry e : entries) {
-            if(e.getTime() < timestamp) {
-                selected.add(e);
-            }
-        }
-        return selected;
     }
 }

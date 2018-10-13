@@ -63,7 +63,7 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         }
 
         void bindTo(int i) {
-            String hours = TimeUtils.getHourFormat(mWeatherOfDay.get(i).getTime());
+            String hours = TimeUtils.getHourString(mWeatherOfDay.get(i).getTime());
             textViewHours.setText(hours);
             String temp = mContext.getString(R.string.item_hourly_temp, mWeatherOfDay.get(i).getTemp());
             textViewTemp.setText(temp);

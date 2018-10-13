@@ -31,13 +31,14 @@
         tools:text="Запорожье" />
 
     <ImageView
-        android:id="@+id/ic_place"
+        android:id="@+id/ic_place_picker"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:background="@drawable/ic_place"
+        android:src="@drawable/ic_place"
+        android:background="@drawable/ripple_effect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

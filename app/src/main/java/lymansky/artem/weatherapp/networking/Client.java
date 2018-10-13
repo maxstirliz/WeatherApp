@@ -1,4 +1,4 @@
-package lymansky.artem.weatherapp.network;
+package lymansky.artem.weatherapp.networking;
 
 
 import retrofit2.Retrofit;

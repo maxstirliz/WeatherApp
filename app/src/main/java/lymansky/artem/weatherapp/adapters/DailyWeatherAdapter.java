@@ -31,7 +31,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         void onItemClick(int day);
     }
 
-    public static void setOnItemClickListener (OnItemClick listener) {
+    public static void setOnItemClickListener(OnItemClick listener) {
         itemClickListener = listener;
     }
 
@@ -89,7 +89,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             notifyItemChanged(mSelectedPos);
             mSelectedPos = getAdapterPosition();
             notifyItemChanged(mSelectedPos);
-            itemClickListener.onItemClick(mDailyWeather.get(getAdapterPosition()).getDayNumber());
+            itemClickListener.onItemClick(mDailyWeather.get(mSelectedPos).getDayNumber());
         }
 
         public void setSelected(boolean selected) {
@@ -98,29 +98,22 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
         void bindTo(int i) {
             int dayNumber = mDailyWeather.get(i).getDayNumber();
+            String day = TimeUtils.getWeekDayFormat(mDailyWeather.get(i).getTime());
+            textViewWeekDay.setText(day);
+            String range = mContext.getString(R.string.df_temperature_range,
+                    WeatherDataUtils.getMaxTempByDay(mEntries, dayNumber),
+                    WeatherDataUtils.getMinTempByDay(mEntries, dayNumber));
+            textViewTempRange.setText(range);
+            List<WeatherEntry> days = WeatherDataUtils.getWeatherOfDay(mEntries, dayNumber);
+            int res = IconUtils.getIconResource(days.get(WeatherDataUtils.getRecentHourIndex(days)).getPic(), isSelected);
+            imageViewWeatherIcon.setImageResource(res);
             if (isSelected) {
-                String day = TimeUtils.getWeekDayFormat(mDailyWeather.get(i).getTime());
-                textViewWeekDay.setText(day);
                 textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
-                String range = mContext.getString(R.string.df_temperature_range,
-                        WeatherDataUtils.getMaxTempByDay(mEntries, dayNumber),
-                        WeatherDataUtils.getMinTempByDay(mEntries, dayNumber));
-                textViewTempRange.setText(range);
                 textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
-                int res = IconUtils.getIconResource(mDailyWeather.get(i).getPic(), isSelected);
-                imageViewWeatherIcon.setImageResource(res);
                 view.setBackgroundColor(mContext.getResources().getColor(R.color.colorSelectionBg));
             } else {
-                String day = TimeUtils.getWeekDayFormat(mDailyWeather.get(i).getTime());
-                textViewWeekDay.setText(day);
                 textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorText));
-                String range = mContext.getString(R.string.df_temperature_range,
-                        WeatherDataUtils.getMaxTempByDay(mEntries, dayNumber),
-                        WeatherDataUtils.getMinTempByDay(mEntries, dayNumber));
-                textViewTempRange.setText(range);
                 textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorText));
-                int res = IconUtils.getIconResource(mDailyWeather.get(i).getPic(), isSelected);
-                imageViewWeatherIcon.setImageResource(res);
                 view.setBackgroundColor(mContext.getResources().getColor(R.color.colorBackground));
             }
         }
