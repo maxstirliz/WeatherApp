@@ -1,6 +1,5 @@
 package lymansky.artem.weatherapp.db;
 
-import android.app.Application;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;

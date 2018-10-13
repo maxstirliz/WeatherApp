@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
 
 
@@ -68,9 +68,9 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
-        tools:background="@drawable/ic_white_day_cloudy"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/tv_full_date" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_full_date"
+        tools:background="@drawable/ic_white_day_cloudy" />
 
     <ImageView
         android:id="@+id/ic_temperature"
@@ -149,8 +149,19 @@
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        tools:background="@drawable/ic_arrow_up"
         app:layout_constraintBottom_toTopOf="@+id/tv_wind_speed"
         app:layout_constraintStart_toEndOf="@+id/tv_wind_speed"
-        app:layout_constraintTop_toBottomOf="@+id/tv_wind_speed" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_wind_speed"
+        tools:background="@drawable/ic_arrow_up" />
+
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rv_hourly_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/selectionText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

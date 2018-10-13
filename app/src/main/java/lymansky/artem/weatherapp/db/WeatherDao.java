@@ -18,15 +18,12 @@ public interface WeatherDao {
     @Query("SELECT * FROM weather WHERE day_number LIKE :day ORDER BY time ASC")
     LiveData<List<WeatherEntry>> getWeatherOfDay(int day);
 
-    @Query("SELECT DISTINCT day_number FROM weather ORDER BY time ASC")
-    LiveData<List<Integer>> getDayNumbers();
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<WeatherEntry> entries);
 
     @Delete
-    void delete(WeatherEntry weatherEntity);
+    void delete(List<WeatherEntry> weatherEntries);
 
-    @Delete
-    void deletSelected(List<WeatherEntry> entries);
+    @Query("DELETE FROM weather")
+    void deleteAll();
 }

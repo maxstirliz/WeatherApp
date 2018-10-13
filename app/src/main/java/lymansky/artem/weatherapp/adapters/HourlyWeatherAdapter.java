@@ -44,6 +44,11 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         hourlyWeatherViewHolder.bindTo(i);
     }
 
+    public void setNewData(List<WeatherEntry> newData) {
+        mWeatherOfDay = newData;
+        notifyDataSetChanged();
+    }
+
     class HourlyWeatherViewHolder extends RecyclerView.ViewHolder {
 
         TextView textViewHours;
