@@ -48,7 +48,12 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
         if (null != getSupportActionBar()) {
             getSupportActionBar().hide();
         }
+        mSharedPreferences =
+                getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+
         DailyWeatherAdapter.setOnItemClickListener(this);
+
 
         if (savedInstanceState == null) {
             WeatherDetailFragment detailFragment = new WeatherDetailFragment();
@@ -62,25 +67,14 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
             AutoUpdateUtils.scheduleWeatherUpdater(this);
         }
 
-        mSharedPreferences =
-                getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
         long lastUpdateTime = mSharedPreferences.getLong(getString(R.string.last_update_key), 0L);
         long currentTime = System.currentTimeMillis();
-
         if (currentTime - lastUpdateTime > UPDATE_DATABASE_MILLISECONDS) {
-            Intent intent = new Intent(this, UpdateRoomService.class);
-            String cityName = mSharedPreferences.getString(getString(R.string.city_name_key),
-                    getString(R.string.default_city_name));
-            float lat = mSharedPreferences.getFloat(getString(R.string.latitude_key),
-                    47.8388F);
-            float lon = mSharedPreferences.getFloat(getString(R.string.longitude_key),
-                    35.1396F);
-            intent.putExtra(EXTRA_CITY_NAME, cityName);
-            intent.putExtra(EXTRA_CITY_LAT, lat);
-            intent.putExtra(EXTRA_CITY_LON, lon);
-            startService(intent);
+            startUpdateService();
         }
     }
+
 
     @Override
     public void onItemClick(int day) {
@@ -94,26 +88,33 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
     }
 
     @Override
-    public void onLocationPressed() {
-        try {
-            AutocompleteFilter cityFilter = new AutocompleteFilter.Builder()
-                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-                    .build();
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                    .setFilter(cityFilter)
-                    .build(this);
-            startActivityForResult(intent, CITY_AUTOCOMPLETE_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException e) {
-            Toast.makeText(this, "GPL disabled or not installed", Toast.LENGTH_SHORT).show();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(this, "GPL not available", Toast.LENGTH_SHORT).show();
+    public void onButtonPressed(int button) {
+        switch (button) {
+            case WeatherDetailFragment.BUTTON_LOCATION:
+                try {
+                    AutocompleteFilter cityFilter = new AutocompleteFilter.Builder()
+                            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                            .build();
+                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .setFilter(cityFilter)
+                            .build(this);
+                    startActivityForResult(intent, CITY_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException e) {
+                    Toast.makeText(this, getString(R.string.google_ps_not_working), Toast.LENGTH_SHORT).show();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Toast.makeText(this, getString(R.string.google_ps_not_available), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case WeatherDetailFragment.BUTTON_SYNC:
+                startUpdateService();
+                break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == CITY_AUTOCOMPLETE_REQUEST_CODE) {
-            if(resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
 
                 LatLng latLng = place.getLatLng();
@@ -126,10 +127,24 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
                 startService(intent);
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Toast.makeText(this, "Error while picking city", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.error_picking_up_city), Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
-
+                Toast.makeText(this, getString(R.string.result_canceled), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void startUpdateService() {
+        Intent intent = new Intent(this, UpdateRoomService.class);
+        String cityName = mSharedPreferences.getString(getString(R.string.city_name_key),
+                getString(R.string.default_city_name));
+        float lat = mSharedPreferences.getFloat(getString(R.string.latitude_key),
+                47.8388F);
+        float lon = mSharedPreferences.getFloat(getString(R.string.longitude_key),
+                35.1396F);
+        intent.putExtra(EXTRA_CITY_NAME, cityName);
+        intent.putExtra(EXTRA_CITY_LAT, lat);
+        intent.putExtra(EXTRA_CITY_LON, lon);
+        startService(intent);
     }
 }

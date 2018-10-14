@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="df_wind_speed">%1$d м/с</string>
+    <string name="download_error">Ошибка обновления базы данных, тип:</string>
+    <string name="no_internet_banner_text">Нет интернета! Нет погоды!</string>
+    <string name="error_picking_up_city">Ошибка при выборе города</string>
+    <string name="result_canceled">Рузультат отменен</string>
+    <string name="google_ps_not_working">Google Play Services не работают</string>
+    <string name="google_ps_not_available">Google Play Services недоступны</string>
+</resources>

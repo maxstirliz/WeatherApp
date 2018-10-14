@@ -1,12 +1,16 @@
 package lymansky.artem.weatherapp.fragments;
 
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +31,11 @@ import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
 public class WeatherDetailFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String DATABASE_STATE = "database-state";
+
+    public static final int BUTTON_LOCATION = 0;
+    public static final int BUTTON_SYNC = 1;
+
     private TextView mCityName;
     private TextView mFullDate;
     private TextView mTemperature;
@@ -36,11 +45,20 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     private ImageView mWindDirectionPic;
     private ImageView mPlaceIcon;
 
+    private ImageView mTempIcon;
+    private ImageView mHumidIcon;
+    private ImageView mWindIcon;
+    private ConstraintLayout mNoInternetBanner;
+    private ImageView mSyncIcon;
+    private boolean mConnectedToInternet;
+    private boolean mDatabaseEmpty;
+
     private int mDayToShow = -1;
     private RecyclerView mRv;
     private WeatherDataViewModel mViewModel;
     private HourlyWeatherAdapter mAdapter;
     private LinearLayoutManager mLayoutManger;
+
 
     private OnLocationPickerListener mListener;
     private SharedPreferences mSharedPreferences;
@@ -54,6 +72,18 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         View view = inflater.inflate(R.layout.weather_detail_fragment, container, false);
         initViews(view);
 
+        if (savedInstanceState != null) {
+            mDatabaseEmpty = savedInstanceState.getBoolean(DATABASE_STATE);
+        }
+
+        if (mDatabaseEmpty) {
+            hideViews();
+        }
+
+        if (!mConnectedToInternet) {
+            showBanner();
+        }
+
 
         mViewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
         mViewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
@@ -64,12 +94,24 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
                         mDayToShow = TimeUtils.getDayNumber(System.currentTimeMillis());
                     }
                     List<WeatherEntry> dayEntries = WeatherDataUtils.getWeatherOfDay(entries, mDayToShow);
+                    if (dayEntries.size() == 0) {
+                        mDayToShow++;
+                        dayEntries = WeatherDataUtils.getWeatherOfDay(entries, mDayToShow);
+                    }
                     bindData(dayEntries);
+                    hideBanner();
+                    showViews();
                     if (mAdapter == null) {
                         mAdapter = new HourlyWeatherAdapter(dayEntries);
                         mRv.setAdapter(mAdapter);
                     } else {
                         mAdapter.setNewData(dayEntries);
+                    }
+                } else {
+                    mDatabaseEmpty = true;
+                    if (!mConnectedToInternet) {
+                        hideViews();
+                        showBanner();
                     }
                 }
             }
@@ -81,7 +123,15 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mPlaceIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onLocationPressed();
+                mListener.onButtonPressed(BUTTON_LOCATION);
+                showViews();
+            }
+        });
+
+        mSyncIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onButtonPressed(BUTTON_SYNC);
             }
         });
 
@@ -93,9 +143,8 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         super.onAttach(context);
         mSharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
-        if (context instanceof OnLocationPickerListener) {
-            mListener = (OnLocationPickerListener) context;
-        }
+        mListener = (OnLocationPickerListener) context;
+        mConnectedToInternet = isNetworkAvailable((Activity) context);
     }
 
     @Override
@@ -108,6 +157,12 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     public void onPause() {
         super.onPause();
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(DATABASE_STATE, mDatabaseEmpty);
     }
 
     @Override
@@ -132,6 +187,12 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mWindDirectionPic = view.findViewById(R.id.ic_wind_direction);
         mPlaceIcon = view.findViewById(R.id.ic_place_picker);
 
+        mTempIcon = view.findViewById(R.id.ic_temperature);
+        mHumidIcon = view.findViewById(R.id.ic_humidity);
+        mWindIcon = view.findViewById(R.id.ic_wind);
+        mNoInternetBanner = view.findViewById(R.id.cl_no_internet_banner);
+        mSyncIcon = view.findViewById(R.id.ic_sync);
+
         mLayoutManger = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRv = view.findViewById(R.id.rv_hourly_fragment);
         mRv.setHasFixedSize(true);
@@ -152,7 +213,37 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mWeatherPic.setImageResource(IconUtils.getIconResource(e.getPic()));
     }
 
+    private boolean isNetworkAvailable(Activity activity) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void hideViews() {
+        mTempIcon.setVisibility(View.INVISIBLE);
+        mHumidIcon.setVisibility(View.INVISIBLE);
+        mWindIcon.setVisibility(View.INVISIBLE);
+        mSyncIcon.setVisibility(View.VISIBLE);
+    }
+
+    private void showViews() {
+        mTempIcon.setVisibility(View.VISIBLE);
+        mHumidIcon.setVisibility(View.VISIBLE);
+        mWindIcon.setVisibility(View.VISIBLE);
+        mSyncIcon.setVisibility(View.GONE);
+    }
+
+    private void hideBanner() {
+        mNoInternetBanner.setVisibility(View.INVISIBLE);
+    }
+
+    private void showBanner() {
+        mNoInternetBanner.setVisibility(View.VISIBLE);
+    }
+
+
     public interface OnLocationPickerListener {
-        void onLocationPressed();
+        void onButtonPressed(int action);
     }
 }

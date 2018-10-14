@@ -28,6 +28,9 @@ public class UpdateRoomService extends IntentService {
 
     private static final String LOG_TAG = UpdateRoomService.class.getSimpleName();
 
+    private SharedPreferences mSharedPreferences;
+    private boolean mLocationChanged;
+
 
     public UpdateRoomService() {
         super("UpdateRoomService");
@@ -39,12 +42,22 @@ public class UpdateRoomService extends IntentService {
         String cityName = getString(R.string.default_city_name);
         float lat = 47.8388F;
         float lon = 35.1396F;
+        mSharedPreferences = getSharedPreferences(getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE);
 
         final AppDatabase database = AppDatabase.getInstance(this);
         if (intent != null) {
             cityName = intent.getStringExtra(MainActivity.EXTRA_CITY_NAME);
             lat = intent.getFloatExtra(MainActivity.EXTRA_CITY_LAT, 47.8388F);
             lon = intent.getFloatExtra(MainActivity.EXTRA_CITY_LON, 35.1396F);
+
+            float prefLat = mSharedPreferences.getFloat(getString(R.string.latitude_key),
+                    47.8388F);
+            float prefLon = mSharedPreferences.getFloat(getString(R.string.longitude_key),
+                    35.1396F);
+
+            mLocationChanged = lat != prefLat || lon != prefLon;
+
         }
 
         Client.getService(Service.class).getWeatherByCoord(
@@ -62,7 +75,11 @@ public class UpdateRoomService extends IntentService {
                             new AsyncTask<Void, Void, Void>() {
                                 @Override
                                 protected Void doInBackground(Void... voids) {
-                                    database.weatherDao().deleteOldItems(TimeUtils.getCurrentDayNumber());
+                                    if (mLocationChanged) {
+                                        database.weatherDao().deleteAll();
+                                    } else {
+                                        database.weatherDao().deleteOldItems(TimeUtils.getCurrentDayNumber());
+                                    }
                                     database.weatherDao().insertAll(entries);
                                     return null;
                                 }
@@ -77,9 +94,8 @@ public class UpdateRoomService extends IntentService {
                         Log.e(LOG_TAG, getString(R.string.download_error) + error);
                     }
                 });
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key)
-                , Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(getString(R.string.city_name_key),
                 cityName);
         editor.putLong(getString(R.string.last_update_key),

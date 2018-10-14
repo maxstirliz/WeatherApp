@@ -18,14 +18,14 @@ public interface WeatherDao {
     @Query("SELECT * FROM weather WHERE day_number = :day")
     LiveData<List<WeatherEntry>> getWeatherOfDay(int day);
 
-    @Query("SELECT COUNT(*) FROM weather")
-    int getTableCount();
-
     //INSERT
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<WeatherEntry> entries);
 
     //DELETE
-    @Query("DELETE FROM weather WHERE day_number < :day")
+    @Query("DELETE FROM weather WHERE day_number < :day OR day_number > :day + 4")
     void deleteOldItems(int day);
+
+    @Query("DELETE FROM weather")
+    void deleteAll();
 }

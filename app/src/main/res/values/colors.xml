@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#4a90e2</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="colorSelectionBg">#F3F8FE</color>
+    <color name="colorSelectionBg">#f3f8fe</color>
     <color name="selectionText">#5a9ff0</color>
     <color name="colorBackground">#ffffff</color>
     <color name="colorText">#000000</color>

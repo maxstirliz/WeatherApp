@@ -37,8 +37,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:src="@drawable/ic_place"
         android:background="@drawable/ripple_effect"
+        android:src="@drawable/ic_place"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -75,12 +75,13 @@
 
     <ImageView
         android:id="@+id/ic_temperature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/ic_temp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/ic_weather_pic" />
 
@@ -93,6 +94,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_humidity"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/ic_wind"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/ic_temperature" />
@@ -105,6 +107,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_wind"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/ic_weather_pic"
         app:layout_constraintStart_toStartOf="@+id/guideline" />
 
@@ -162,6 +165,35 @@
         android:layout_height="wrap_content"
         android:background="@color/selectionText"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <include
+        layout="@layout/no_internet_banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ic_sync"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ripple_effect"
+        android:src="@drawable/ic_sync"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/rv_hourly_fragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
