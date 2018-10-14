@@ -59,6 +59,5 @@ public class DailyWeatherFragment extends Fragment {
         mRv = view.findViewById(R.id.rv_daily_fragment);
         mRv.setHasFixedSize(true);
         mRv.setLayoutManager(layoutManager);
-        mRv.setItemAnimator(null);
     }
 }
