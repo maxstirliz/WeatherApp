@@ -29,7 +29,6 @@ public class ScheduledJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters job) {
-        Log.e("---onStartJob---", "method start");
         final SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
         String cityName = sharedPreferences.getString(getString(R.string.city_name_key),
@@ -54,7 +53,6 @@ public class ScheduledJobService extends JobService {
 
                                 @Override
                                 protected Object doInBackground(Object[] objects) {
-                                    Log.e("---onStartJob---", "doInBackground started");
                                     database.weatherDao().deleteOldItems(TimeUtils.getCurrentDayNumber());
                                     database.weatherDao().insertAll(entries);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
