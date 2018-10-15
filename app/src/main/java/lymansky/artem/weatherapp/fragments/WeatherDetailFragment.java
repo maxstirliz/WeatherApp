@@ -77,14 +77,6 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
             mDatabaseEmpty = savedInstanceState.getBoolean(DATABASE_STATE);
         }
 
-        if (mDatabaseEmpty) {
-            hideViews();
-        }
-
-        if (!mConnectedToInternet) {
-            showBanner();
-        }
-
 
         mViewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
         mViewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
@@ -101,6 +93,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
                     }
                     bindData(dayEntries);
                     hideBanner();
+                    hideSync();
                     showViews();
                     if (mAdapter == null) {
                         mAdapter = new HourlyWeatherAdapter(dayEntries);
@@ -113,6 +106,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
                     if (!mConnectedToInternet) {
                         hideViews();
                         showBanner();
+                        showSync();
                     }
                 }
             }
@@ -125,7 +119,6 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
             @Override
             public void onClick(View v) {
                 mListener.onButtonPressed(BUTTON_LOCATION);
-                showViews();
             }
         });
 
@@ -152,6 +145,10 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     public void onResume() {
         super.onResume();
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        if(isNetworkAvailable(getActivity())) {
+            hideBanner();
+        }
+
     }
 
     @Override
@@ -225,14 +222,12 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mTempIcon.setVisibility(View.INVISIBLE);
         mHumidIcon.setVisibility(View.INVISIBLE);
         mWindIcon.setVisibility(View.INVISIBLE);
-        mSyncIcon.setVisibility(View.VISIBLE);
     }
 
     private void showViews() {
         mTempIcon.setVisibility(View.VISIBLE);
         mHumidIcon.setVisibility(View.VISIBLE);
         mWindIcon.setVisibility(View.VISIBLE);
-        mSyncIcon.setVisibility(View.GONE);
     }
 
     private void hideBanner() {
@@ -241,6 +236,14 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
 
     private void showBanner() {
         mNoInternetBanner.setVisibility(View.VISIBLE);
+    }
+
+    private void showSync() {
+        mSyncIcon.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSync() {
+        mSyncIcon.setVisibility(View.GONE);
     }
 
 

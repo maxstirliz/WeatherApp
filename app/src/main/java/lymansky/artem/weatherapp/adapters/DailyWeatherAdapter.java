@@ -16,9 +16,7 @@ import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.utils.IconUtils;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.DailyWeatherViewHolder> {
-
-    private Context mContext;
-
+    
     private List<DayItem> mDayItems;
 
     private int mSelectedPos = RecyclerView.NO_POSITION;
@@ -40,8 +38,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     @NonNull
     @Override
     public DailyWeatherViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        mContext = viewGroup.getContext();
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         View view = inflater.inflate(R.layout.list_item_daily, viewGroup, false);
         return new DailyWeatherViewHolder(view);
     }
@@ -98,12 +95,12 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             int icRes = IconUtils.getIconResource(mDayItems.get(i).getIcon(), isSelected);
             imageViewWeatherIcon.setImageResource(icRes);
             if (isSelected) {
-                textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
-                textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
+                textViewWeekDay.setTextColor(view.getResources().getColor(R.color.colorPrimary));
+                textViewTempRange.setTextColor(view.getResources().getColor(R.color.colorPrimary));
                 view.setBackgroundColor(view.getResources().getColor(R.color.colorSelectionBg));
             } else {
-                textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorText));
-                textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorText));
+                textViewWeekDay.setTextColor(view.getResources().getColor(R.color.colorText));
+                textViewTempRange.setTextColor(view.getResources().getColor(R.color.colorText));
                 view.setBackgroundColor(view.getResources().getColor(R.color.colorBackground));
             }
         }

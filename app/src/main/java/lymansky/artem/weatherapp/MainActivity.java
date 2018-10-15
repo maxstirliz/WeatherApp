@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
                     AutocompleteFilter cityFilter = new AutocompleteFilter.Builder()
                             .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                             .build();
-                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
                             .setFilter(cityFilter)
                             .build(this);
                     startActivityForResult(intent, CITY_AUTOCOMPLETE_REQUEST_CODE);
