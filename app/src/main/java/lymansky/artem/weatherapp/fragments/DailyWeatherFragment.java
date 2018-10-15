@@ -16,7 +16,9 @@ import java.util.List;
 
 import lymansky.artem.weatherapp.R;
 import lymansky.artem.weatherapp.adapters.DailyWeatherAdapter;
+import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.db.WeatherEntry;
+import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
 public class DailyWeatherFragment extends Fragment {
 
@@ -38,15 +40,13 @@ public class DailyWeatherFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
-
+                    List<DayItem> dayItems = WeatherDataUtils.getDayItems(entries, getContext());
                     if (mAdapter == null) {
-                        mAdapter = new DailyWeatherAdapter(entries);
+                        mAdapter = new DailyWeatherAdapter(dayItems);
                         mRv.setAdapter(mAdapter);
                     } else {
-                        mAdapter.setNewData(entries);
-                        mAdapter.notifyDataSetChanged();
+                        mAdapter.setNewData(dayItems);
                     }
-
                 }
             }
         });

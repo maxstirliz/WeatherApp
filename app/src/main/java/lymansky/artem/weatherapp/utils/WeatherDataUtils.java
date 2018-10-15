@@ -1,9 +1,13 @@
 package lymansky.artem.weatherapp.utils;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import lymansky.artem.weatherapp.R;
 import lymansky.artem.weatherapp.data.DayData;
+import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.data.WeatherData;
 import lymansky.artem.weatherapp.db.WeatherEntry;
 
@@ -161,5 +165,34 @@ public class WeatherDataUtils {
             }
         }
         return index;
+    }
+
+    /**
+     * Returns DayItems for the day list
+     *
+     * @param entries
+     * @param context
+     * @return
+     */
+    public static List<DayItem> getDayItems(List<WeatherEntry> entries, Context context) {
+
+        List<DayItem> dayItems = new ArrayList<>();
+        List<WeatherEntry> uniqueDays = getUniqueDays(entries);
+        for (WeatherEntry e : uniqueDays) {
+            List<WeatherEntry> dayWeather = getWeatherOfDay(entries, e.getDayNumber());
+            DayItem item = new DayItem();
+
+            item.setWeekDay(TimeUtils.getWeekDayFormat(e.getTime()));
+            String tempRange = context.getString(R.string.df_temperature_range,
+                    getMaxTempByDay(dayWeather, e.getDayNumber()),
+                    getMinTempByDay(dayWeather, e.getDayNumber()));
+            item.setTempRange(tempRange);
+            int index = getRecentHourIndex(dayWeather);
+            item.setIcon(dayWeather.get(index).getPic());
+            item.setDayNumber(e.getDayNumber());
+
+            dayItems.add(item);
+        }
+        return dayItems;
     }
 }

@@ -12,16 +12,14 @@ import android.widget.TextView;
 import java.util.List;
 
 import lymansky.artem.weatherapp.R;
-import lymansky.artem.weatherapp.db.WeatherEntry;
+import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.utils.IconUtils;
-import lymansky.artem.weatherapp.utils.TimeUtils;
-import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.DailyWeatherViewHolder> {
 
     private Context mContext;
-    private List<WeatherEntry> mEntries;
-    private List<WeatherEntry> mDailyWeather;
+
+    private List<DayItem> mDayItems;
 
     private int mSelectedPos = RecyclerView.NO_POSITION;
 
@@ -35,9 +33,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         itemClickListener = listener;
     }
 
-    public DailyWeatherAdapter(List<WeatherEntry> entries) {
-        mEntries = entries;
-        mDailyWeather = WeatherDataUtils.getUniqueDays(entries);
+    public DailyWeatherAdapter(List<DayItem> items) {
+        mDayItems = items;
     }
 
     @NonNull
@@ -51,7 +48,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     @Override
     public int getItemCount() {
-        return mDailyWeather.size();
+        return mDayItems.size();
     }
 
     @Override
@@ -60,9 +57,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         dailyWeatherViewHolder.bindTo(i);
     }
 
-    public void setNewData(List<WeatherEntry> entries) {
-        mEntries = entries;
-        mDailyWeather = WeatherDataUtils.getUniqueDays(entries);
+    public void setNewData(List<DayItem> items) {
+        mDayItems = items;
         notifyDataSetChanged();
     }
 
@@ -89,7 +85,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             notifyItemChanged(mSelectedPos);
             mSelectedPos = getAdapterPosition();
             notifyItemChanged(mSelectedPos);
-            itemClickListener.onItemClick(mDailyWeather.get(mSelectedPos).getDayNumber());
+            itemClickListener.onItemClick(mDayItems.get(mSelectedPos).getDayNumber());
         }
 
         public void setSelected(boolean selected) {
@@ -97,24 +93,18 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         }
 
         void bindTo(int i) {
-            int dayNumber = mDailyWeather.get(i).getDayNumber();
-            String day = TimeUtils.getWeekDayFormat(mDailyWeather.get(i).getTime());
-            textViewWeekDay.setText(day);
-            String range = mContext.getString(R.string.df_temperature_range,
-                    WeatherDataUtils.getMaxTempByDay(mEntries, dayNumber),
-                    WeatherDataUtils.getMinTempByDay(mEntries, dayNumber));
-            textViewTempRange.setText(range);
-            List<WeatherEntry> days = WeatherDataUtils.getWeatherOfDay(mEntries, dayNumber);
-            int res = IconUtils.getIconResource(days.get(WeatherDataUtils.getRecentHourIndex(days)).getPic(), isSelected);
-            imageViewWeatherIcon.setImageResource(res);
+            textViewWeekDay.setText(mDayItems.get(i).getWeekDay());
+            textViewTempRange.setText(mDayItems.get(i).getTempRange());
+            int icRes = IconUtils.getIconResource(mDayItems.get(i).getIcon(), isSelected);
+            imageViewWeatherIcon.setImageResource(icRes);
             if (isSelected) {
                 textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
                 textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
-                view.setBackgroundColor(mContext.getResources().getColor(R.color.colorSelectionBg));
+                view.setBackgroundColor(view.getResources().getColor(R.color.colorSelectionBg));
             } else {
                 textViewWeekDay.setTextColor(mContext.getResources().getColor(R.color.colorText));
                 textViewTempRange.setTextColor(mContext.getResources().getColor(R.color.colorText));
-                view.setBackgroundColor(mContext.getResources().getColor(R.color.colorBackground));
+                view.setBackgroundColor(view.getResources().getColor(R.color.colorBackground));
             }
         }
     }
