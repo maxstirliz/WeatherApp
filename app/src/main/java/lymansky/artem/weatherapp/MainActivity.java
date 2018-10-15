@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -18,14 +17,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.concurrent.TimeUnit;
 
-import lymansky.artem.weatherapp.adapters.DailyWeatherAdapter;
 import lymansky.artem.weatherapp.fragments.DailyWeatherFragment;
 import lymansky.artem.weatherapp.fragments.WeatherDetailFragment;
 import lymansky.artem.weatherapp.services.UpdateRoomService;
 import lymansky.artem.weatherapp.utils.AutoUpdateUtils;
 
-public class MainActivity extends AppCompatActivity implements DailyWeatherAdapter.OnItemClick,
-        WeatherDetailFragment.OnLocationPickerListener {
+public class MainActivity extends AppCompatActivity implements WeatherDetailFragment.DetailFragmentButtonListener {
 
     public static final String EXTRA_CITY_NAME = "city-name-extra";
     public static final String EXTRA_CITY_LAT = "city-latitude-extra";
@@ -52,9 +49,6 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
                 getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
-        DailyWeatherAdapter.setOnItemClickListener(this);
-
-
         if (savedInstanceState == null) {
             WeatherDetailFragment detailFragment = new WeatherDetailFragment();
             DailyWeatherFragment dailyFragment = new DailyWeatherFragment();
@@ -73,18 +67,6 @@ public class MainActivity extends AppCompatActivity implements DailyWeatherAdapt
         if (currentTime - lastUpdateTime > UPDATE_DATABASE_MILLISECONDS) {
             startUpdateService();
         }
-    }
-
-
-    @Override
-    public void onItemClick(int day) {
-        WeatherDetailFragment fragment = new WeatherDetailFragment();
-        fragment.setDayToShow(day);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .add(R.id.detail_fragment_container, fragment)
-                .commit();
     }
 
     @Override

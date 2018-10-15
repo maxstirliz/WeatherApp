@@ -1,6 +1,5 @@
 package lymansky.artem.weatherapp.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,7 +15,7 @@ import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.utils.IconUtils;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.DailyWeatherViewHolder> {
-    
+
     private List<DayItem> mDayItems;
 
     private int mSelectedPos = RecyclerView.NO_POSITION;
@@ -27,12 +26,9 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         void onItemClick(int day);
     }
 
-    public static void setOnItemClickListener(OnItemClick listener) {
-        itemClickListener = listener;
-    }
-
-    public DailyWeatherAdapter(List<DayItem> items) {
+    public DailyWeatherAdapter(List<DayItem> items, OnItemClick listener) {
         mDayItems = items;
+        itemClickListener = listener;
     }
 
     @NonNull

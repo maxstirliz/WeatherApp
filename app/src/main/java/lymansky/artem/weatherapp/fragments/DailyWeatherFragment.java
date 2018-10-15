@@ -21,10 +21,11 @@ import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.db.WeatherEntry;
 import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
-public class DailyWeatherFragment extends Fragment {
+public class DailyWeatherFragment extends Fragment implements DailyWeatherAdapter.OnItemClick {
 
     private RecyclerView mRv;
     private DailyWeatherAdapter mAdapter;
+    private WeatherDataViewModel mViewModel;
 
 
     public DailyWeatherFragment() {
@@ -36,14 +37,14 @@ public class DailyWeatherFragment extends Fragment {
         View view = inflater.inflate(R.layout.daily_weather_fragment, container, false);
         initViews(view);
 
-        WeatherDataViewModel viewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
-        viewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
+        mViewModel = ViewModelProviders.of(getActivity()).get(WeatherDataViewModel.class);
+        mViewModel.getAll().observe(this, new Observer<List<WeatherEntry>>() {
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
                     List<DayItem> dayItems = WeatherDataUtils.getDayItems(entries, getContext());
                     if (mAdapter == null) {
-                        mAdapter = new DailyWeatherAdapter(dayItems);
+                        mAdapter = new DailyWeatherAdapter(dayItems, DailyWeatherFragment.this);
                         mRv.setAdapter(mAdapter);
                     } else {
                         mAdapter.setNewData(dayItems);
@@ -51,6 +52,8 @@ public class DailyWeatherFragment extends Fragment {
                 }
             }
         });
+
+
 
         return view;
     }
@@ -60,5 +63,10 @@ public class DailyWeatherFragment extends Fragment {
         mRv = view.findViewById(R.id.rv_daily_fragment);
         mRv.setHasFixedSize(true);
         mRv.setLayoutManager(layoutManager);
+    }
+
+    @Override
+    public void onItemClick(int day) {
+        mViewModel.selectDay(day);
     }
 }

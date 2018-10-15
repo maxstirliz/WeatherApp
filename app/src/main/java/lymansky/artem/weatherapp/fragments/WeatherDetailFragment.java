@@ -61,15 +61,16 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     private LinearLayoutManager mLayoutManger;
 
 
-    private OnLocationPickerListener mListener;
+    private DetailFragmentButtonListener mListener;
     private SharedPreferences mSharedPreferences;
+    private List<WeatherEntry> mEntries;
 
     public WeatherDetailFragment() {
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.weather_detail_fragment, container, false);
         initViews(view);
 
@@ -83,6 +84,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
+                    mEntries = entries;
                     if (mDayToShow < 0) {
                         mDayToShow = TimeUtils.getDayNumber(System.currentTimeMillis());
                     }
@@ -107,6 +109,29 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
                         hideViews();
                         showBanner();
                         showSync();
+                    }
+                }
+            }
+        });
+        mViewModel.getDayToShow().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                if (integer != null && integer != 0) {
+                    mDayToShow = integer;
+                    if(mEntries == null) {
+                        return;
+                    }
+                    List<WeatherEntry> dayEntries = WeatherDataUtils.getWeatherOfDay(mEntries, mDayToShow);
+                    if (dayEntries.size() == 0) {
+                        mViewModel.selectDay(++mDayToShow);
+                        dayEntries = WeatherDataUtils.getWeatherOfDay(mEntries, mDayToShow);
+                    }
+                    bindData(dayEntries);
+                    if (mAdapter == null) {
+                        mAdapter = new HourlyWeatherAdapter(dayEntries);
+                        mRv.setAdapter(mAdapter);
+                    } else {
+                        mAdapter.setNewData(dayEntries);
                     }
                 }
             }
@@ -137,7 +162,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         super.onAttach(context);
         mSharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
-        mListener = (OnLocationPickerListener) context;
+        mListener = (DetailFragmentButtonListener) context;
         mConnectedToInternet = isNetworkAvailable((Activity) context);
     }
 
@@ -145,7 +170,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     public void onResume() {
         super.onResume();
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        if(isNetworkAvailable(getActivity())) {
+        if (isNetworkAvailable(getActivity())) {
             hideBanner();
         }
 
@@ -247,7 +272,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     }
 
 
-    public interface OnLocationPickerListener {
+    public interface DetailFragmentButtonListener {
         void onButtonPressed(int action);
     }
 }
