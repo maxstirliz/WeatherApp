@@ -23,6 +23,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import lymansky.artem.weatherapp.R;
+import lymansky.artem.weatherapp.WeatherDataViewModel;
 import lymansky.artem.weatherapp.adapters.HourlyWeatherAdapter;
 import lymansky.artem.weatherapp.db.WeatherEntry;
 import lymansky.artem.weatherapp.utils.IconUtils;

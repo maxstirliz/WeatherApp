@@ -17,7 +17,7 @@ import lymansky.artem.weatherapp.services.ScheduledJobService;
 public class AutoUpdateUtils {
 
     private static final int REMINDER_INTERVAL_HOURS = 1;
-    private static final int REMINDER_GO_OFF_HOURS = 3;
+    private static final int REMINDER_GO_OFF_HOURS = 2;
     private static final int REMINDER_INTERVAL_SECONDS = (int) TimeUnit.HOURS.toSeconds(REMINDER_INTERVAL_HOURS);
     private static final int REMINDER_GO_OFF_SECONDS = (int) TimeUnit.HOURS.toSeconds(REMINDER_GO_OFF_HOURS);
 

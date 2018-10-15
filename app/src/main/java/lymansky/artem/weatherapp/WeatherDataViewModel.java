@@ -1,4 +1,4 @@
-package lymansky.artem.weatherapp.fragments;
+package lymansky.artem.weatherapp;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

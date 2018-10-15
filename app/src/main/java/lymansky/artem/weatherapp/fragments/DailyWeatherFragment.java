@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import lymansky.artem.weatherapp.R;
+import lymansky.artem.weatherapp.WeatherDataViewModel;
 import lymansky.artem.weatherapp.adapters.DailyWeatherAdapter;
 import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.db.WeatherEntry;
