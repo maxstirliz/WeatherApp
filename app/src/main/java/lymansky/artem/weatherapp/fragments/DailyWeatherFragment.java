@@ -21,7 +21,7 @@ import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.db.WeatherEntry;
 import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
-public class DailyWeatherFragment extends Fragment implements DailyWeatherAdapter.OnItemClick {
+public class DailyWeatherFragment extends Fragment {
 
     private RecyclerView mRv;
     private DailyWeatherAdapter mAdapter;
@@ -44,7 +44,7 @@ public class DailyWeatherFragment extends Fragment implements DailyWeatherAdapte
                 if (entries != null && entries.size() > 0) {
                     List<DayItem> dayItems = WeatherDataUtils.getDayItems(entries, getContext());
                     if (mAdapter == null) {
-                        mAdapter = new DailyWeatherAdapter(dayItems, DailyWeatherFragment.this);
+                        mAdapter = new DailyWeatherAdapter(dayItems , DailyWeatherFragment.this);
                         mRv.setAdapter(mAdapter);
                     } else {
                         mAdapter.setNewData(dayItems);
@@ -63,10 +63,5 @@ public class DailyWeatherFragment extends Fragment implements DailyWeatherAdapte
         mRv = view.findViewById(R.id.rv_daily_fragment);
         mRv.setHasFixedSize(true);
         mRv.setLayoutManager(layoutManager);
-    }
-
-    @Override
-    public void onItemClick(int day) {
-        mViewModel.selectDay(day);
     }
 }

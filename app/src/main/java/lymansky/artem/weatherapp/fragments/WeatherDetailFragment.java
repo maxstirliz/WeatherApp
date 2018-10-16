@@ -58,7 +58,6 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     private RecyclerView mRv;
     private WeatherDataViewModel mViewModel;
     private HourlyWeatherAdapter mAdapter;
-    private LinearLayoutManager mLayoutManger;
 
 
     private DetailFragmentButtonListener mListener;
@@ -196,10 +195,6 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         }
     }
 
-    public void setDayToShow(int day) {
-        mDayToShow = day;
-    }
-
     private void initViews(View view) {
         mCityName = view.findViewById(R.id.city_name);
         mFullDate = view.findViewById(R.id.tv_full_date);
@@ -216,10 +211,10 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mNoInternetBanner = view.findViewById(R.id.cl_no_internet_banner);
         mSyncIcon = view.findViewById(R.id.ic_sync);
 
-        mLayoutManger = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRv = view.findViewById(R.id.rv_hourly_fragment);
         mRv.setHasFixedSize(true);
-        mRv.setLayoutManager(mLayoutManger);
+        mRv.setLayoutManager(layoutManager);
     }
 
     private void bindData(List<WeatherEntry> entries) {

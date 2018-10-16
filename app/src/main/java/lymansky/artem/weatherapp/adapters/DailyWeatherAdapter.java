@@ -1,6 +1,10 @@
 package lymansky.artem.weatherapp.adapters;
 
+import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import lymansky.artem.weatherapp.R;
+import lymansky.artem.weatherapp.WeatherDataViewModel;
 import lymansky.artem.weatherapp.data.DayItem;
 import lymansky.artem.weatherapp.utils.IconUtils;
 
@@ -20,15 +25,11 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     private int mSelectedPos = RecyclerView.NO_POSITION;
 
-    private static OnItemClick itemClickListener;
+    private WeatherDataViewModel viewModel;
 
-    public interface OnItemClick {
-        void onItemClick(int day);
-    }
-
-    public DailyWeatherAdapter(List<DayItem> items, OnItemClick listener) {
+    public DailyWeatherAdapter(List<DayItem> items, Fragment fragment) {
         mDayItems = items;
-        itemClickListener = listener;
+        viewModel = ViewModelProviders.of(fragment.getActivity()).get(WeatherDataViewModel.class);
     }
 
     @NonNull
@@ -78,7 +79,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             notifyItemChanged(mSelectedPos);
             mSelectedPos = getAdapterPosition();
             notifyItemChanged(mSelectedPos);
-            itemClickListener.onItemClick(mDayItems.get(mSelectedPos).getDayNumber());
+            viewModel.selectDay(mDayItems.get(mSelectedPos).getDayNumber());
+//            itemClickListener.onItemClick(mDayItems.get(mSelectedPos).getDayNumber());
         }
 
         public void setSelected(boolean selected) {

@@ -13,15 +13,14 @@ import lymansky.artem.weatherapp.utils.TimeUtils;
 
 public class WeatherDataViewModel extends AndroidViewModel {
 
-    private AppDatabase mDb;
     private LiveData<List<WeatherEntry>> mAllDays;
     private MutableLiveData<Integer> mDayToShow = new MutableLiveData<>();
 
 
     public WeatherDataViewModel(Application application) {
         super(application);
-        mDb = AppDatabase.getInstance(application);
-        mAllDays = mDb.weatherDao().getAll();
+        AppDatabase db = AppDatabase.getInstance(application);
+        mAllDays = db.weatherDao().getAll();
         mDayToShow.setValue(TimeUtils.getCurrentDayNumber());
     }
 
