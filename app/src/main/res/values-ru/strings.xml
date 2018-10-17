@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="dialog_title">Исопльзовать геоданные данного устройства для более точного определения погоды?</string>
+    <string name="dialog_title">Исопльзовать геоданные для более точного определения погоды?</string>
+    <string name="problems_to_get_location">Проблемы получения геоданных</string>
+    <string name="permission_denied">Отказано в доступе. Можно предоставить его позже в настройках устройства</string>
+    <string name="using_current_location_settings">Используются текущие настройки локации</string>
+    <string name="access_needed">Для продолжения нужен доступ к геоданным устройства</string>
     <string name="positive_answer">Да</string>
     <string name="negative_answer">Нет</string>
     <string name="app_name">WeatherApp</string>

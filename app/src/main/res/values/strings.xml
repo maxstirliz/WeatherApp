@@ -8,9 +8,13 @@
     <string name="df_wind_speed" translatable="true">%1$d m/s</string>
 
     <!--Dialog-->
-    <string name="dialog_title">Use this device location to get more precise forecasts?</string>
+    <string name="dialog_title">Use your location for more precise forecasts?</string>
     <string name="positive_answer">Yes</string>
     <string name="negative_answer">No</string>
+    <string name="problems_to_get_location">Problems with getting location</string>
+    <string name="permission_denied">Permission denied. You can add it later in your device settings</string>
+    <string name="using_current_location_settings">Current location settings are used</string>
+    <string name="access_needed">Access to this device location\'s needed to continue</string>
 
     <!--Hourly item-->
     <string name="item_hourly_temp" translatable="false">%1$d\u02DA</string>

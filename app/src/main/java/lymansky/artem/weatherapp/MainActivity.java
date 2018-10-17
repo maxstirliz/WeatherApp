@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -153,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
                         != PackageManager.PERMISSION_GRANTED) {
                     if(ActivityCompat.shouldShowRequestPermissionRationale(this,
                             Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                        Toast.makeText(this, "Access to this device location needed to continue", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.access_needed, Toast.LENGTH_SHORT).show();
                     } else {
                         ActivityCompat.requestPermissions(this,
                                 new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
                 }
                 break;
             case DialogInterface.BUTTON_NEGATIVE:
-                Toast.makeText(this, "Continue using current location settings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.using_current_location_settings, Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -177,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     processDeviceLocation();
                 } else {
-                    Toast.makeText(this, "Permission denied. You can add it later in your device settings", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
                 }
         }
     }
@@ -202,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
         dialog.show(getSupportFragmentManager(), "dialog");
     }
 
+    //Use last saved approximate geodata to load the weather
     private void processDeviceLocation() {
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -221,12 +221,10 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
                                     intent.putExtra(EXTRA_CITY_NAME, placeName);
                                     intent.putExtra(EXTRA_CITY_LAT, (float) lat);
                                     intent.putExtra(EXTRA_CITY_LON, (float) lon);
-                                    Log.e("--processDeviceLocation", "new lat = " + lat + ", new lon = " + lon + ", new pla" +
-                                            " name = " + placeName);
                                     startService(intent);
                                 }
                             } catch (IOException e) {
-                                Toast.makeText(MainActivity.this, "Problems with getting location", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, R.string.problems_to_get_location, Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
