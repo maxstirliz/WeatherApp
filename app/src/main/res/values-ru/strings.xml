@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="dialog_title">Исопльзовать геоданные данного устройства для более точного определения погоды?</string>
+    <string name="positive_answer">Да</string>
+    <string name="negative_answer">Нет</string>
     <string name="app_name">WeatherApp</string>
     <string name="df_wind_speed">%1$d м/с</string>
     <string name="download_error">Ошибка обновления базы данных, тип:</string>

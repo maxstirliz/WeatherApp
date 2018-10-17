@@ -30,12 +30,14 @@ import lymansky.artem.weatherapp.utils.IconUtils;
 import lymansky.artem.weatherapp.utils.TimeUtils;
 import lymansky.artem.weatherapp.utils.WeatherDataUtils;
 
-public class WeatherDetailFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class WeatherDetailFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener,
+View.OnClickListener {
 
     private static final String DATABASE_STATE = "database-state";
 
     public static final int BUTTON_LOCATION = 0;
     public static final int BUTTON_SYNC = 1;
+    public static final int BUTTON_PLACE = 2;
 
     private TextView mCityName;
     private TextView mFullDate;
@@ -46,6 +48,7 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     private ImageView mWindDirectionPic;
     private ImageView mPlaceIcon;
 
+    private ImageView mLocationIcon;
     private ImageView mTempIcon;
     private ImageView mHumidIcon;
     private ImageView mWindIcon;
@@ -83,6 +86,8 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
             @Override
             public void onChanged(@Nullable List<WeatherEntry> entries) {
                 if (entries != null && entries.size() > 0) {
+                    String cityName = mSharedPreferences.getString(getString(R.string.city_name_key), "");
+                    mCityName.setText(cityName);
                     mEntries = entries;
                     if (mDayToShow < 0) {
                         mDayToShow = TimeUtils.getDayNumber(System.currentTimeMillis());
@@ -139,20 +144,6 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         String cityName = mSharedPreferences.getString(getString(R.string.city_name_key), "");
         mCityName.setText(cityName);
 
-        mPlaceIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onButtonPressed(BUTTON_LOCATION);
-            }
-        });
-
-        mSyncIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onButtonPressed(BUTTON_SYNC);
-            }
-        });
-
         return view;
     }
 
@@ -195,6 +186,22 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ic_sync:
+                mListener.onButtonPressed(BUTTON_SYNC);
+                break;
+            case R.id.ic_place_picker:
+                mListener.onButtonPressed(BUTTON_LOCATION);
+                break;
+            case R.id.ic_location:
+                mListener.onButtonPressed(BUTTON_PLACE);
+                break;
+        }
+
+    }
+
     private void initViews(View view) {
         mCityName = view.findViewById(R.id.city_name);
         mFullDate = view.findViewById(R.id.tv_full_date);
@@ -204,12 +211,15 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
         mWeatherPic = view.findViewById(R.id.ic_weather_pic);
         mWindDirectionPic = view.findViewById(R.id.ic_wind_direction);
         mPlaceIcon = view.findViewById(R.id.ic_place_picker);
-
+        mPlaceIcon.setOnClickListener(this);
         mTempIcon = view.findViewById(R.id.ic_temperature);
         mHumidIcon = view.findViewById(R.id.ic_humidity);
         mWindIcon = view.findViewById(R.id.ic_wind);
         mNoInternetBanner = view.findViewById(R.id.cl_no_internet_banner);
         mSyncIcon = view.findViewById(R.id.ic_sync);
+        mSyncIcon.setOnClickListener(this);
+        mLocationIcon = view.findViewById(R.id.ic_location);
+        mLocationIcon.setOnClickListener(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRv = view.findViewById(R.id.rv_hourly_fragment);
@@ -265,6 +275,8 @@ public class WeatherDetailFragment extends Fragment implements SharedPreferences
     private void hideSync() {
         mSyncIcon.setVisibility(View.GONE);
     }
+
+
 
 
     public interface DetailFragmentButtonListener {

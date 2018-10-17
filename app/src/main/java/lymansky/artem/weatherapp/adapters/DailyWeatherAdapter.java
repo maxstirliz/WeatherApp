@@ -23,11 +23,11 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     private int mSelectedPos = RecyclerView.NO_POSITION;
 
-    private WeatherDataViewModel viewModel;
+    private WeatherDataViewModel mViewModel;
 
     public DailyWeatherAdapter(List<DayItem> items, Fragment fragment) {
         mDayItems = items;
-        viewModel = ViewModelProviders.of(fragment.getActivity()).get(WeatherDataViewModel.class);
+        mViewModel = ViewModelProviders.of(fragment.getActivity()).get(WeatherDataViewModel.class);
     }
 
     @NonNull
@@ -58,14 +58,14 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
         boolean isSelected;
 
-        View view;
+        View backgroundView;
         TextView textViewWeekDay;
         TextView textViewTempRange;
         ImageView imageViewWeatherIcon;
 
-        public DailyWeatherViewHolder(@NonNull View itemView) {
+        DailyWeatherViewHolder(@NonNull View itemView) {
             super(itemView);
-            view = itemView;
+            backgroundView = itemView;
             itemView.setOnClickListener(this);
             textViewWeekDay = itemView.findViewById(R.id.tv_daily_week);
             textViewTempRange = itemView.findViewById(R.id.tv_temp_daily);
@@ -77,7 +77,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             notifyItemChanged(mSelectedPos);
             mSelectedPos = getAdapterPosition();
             notifyItemChanged(mSelectedPos);
-            viewModel.selectDay(mDayItems.get(mSelectedPos).getDayNumber());
+            mViewModel.selectDay(mDayItems.get(mSelectedPos).getDayNumber());
         }
 
         public void setSelected(boolean selected) {
@@ -90,13 +90,13 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             int icRes = IconUtils.getIconResource(mDayItems.get(i).getIcon(), isSelected);
             imageViewWeatherIcon.setImageResource(icRes);
             if (isSelected) {
-                textViewWeekDay.setTextColor(view.getResources().getColor(R.color.colorPrimary));
-                textViewTempRange.setTextColor(view.getResources().getColor(R.color.colorPrimary));
-                view.setBackgroundColor(view.getResources().getColor(R.color.colorSelectionBg));
+                textViewWeekDay.setTextColor(backgroundView.getResources().getColor(R.color.colorPrimary));
+                textViewTempRange.setTextColor(backgroundView.getResources().getColor(R.color.colorPrimary));
+                backgroundView.setBackgroundColor(backgroundView.getResources().getColor(R.color.colorSelectionBg));
             } else {
-                textViewWeekDay.setTextColor(view.getResources().getColor(R.color.colorText));
-                textViewTempRange.setTextColor(view.getResources().getColor(R.color.colorText));
-                view.setBackgroundColor(view.getResources().getColor(R.color.colorBackground));
+                textViewWeekDay.setTextColor(backgroundView.getResources().getColor(R.color.colorText));
+                textViewTempRange.setTextColor(backgroundView.getResources().getColor(R.color.colorText));
+                backgroundView.setBackgroundColor(backgroundView.getResources().getColor(R.color.colorBackground));
             }
         }
     }

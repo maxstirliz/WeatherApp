@@ -1,32 +1,52 @@
 package lymansky.artem.weatherapp;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import lymansky.artem.weatherapp.fragments.DailyWeatherFragment;
+import lymansky.artem.weatherapp.fragments.LocationDialog;
 import lymansky.artem.weatherapp.fragments.WeatherDetailFragment;
 import lymansky.artem.weatherapp.services.UpdateRoomService;
 import lymansky.artem.weatherapp.utils.AutoUpdateUtils;
 
-public class MainActivity extends AppCompatActivity implements WeatherDetailFragment.DetailFragmentButtonListener {
+public class MainActivity extends AppCompatActivity implements WeatherDetailFragment.DetailFragmentButtonListener,
+        LocationDialog.DialogButtonsListener {
 
     public static final String EXTRA_CITY_NAME = "city-name-extra";
     public static final String EXTRA_CITY_LAT = "city-latitude-extra";
     public static final String EXTRA_CITY_LON = "city-longitude-extra";
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 555;
 
     private static final int CITY_AUTOCOMPLETE_REQUEST_CODE = 1;
 
@@ -35,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
             TimeUnit.HOURS.toMillis(UPDATE_HOURS_LIMIT);
 
     private SharedPreferences mSharedPreferences;
+    private FusedLocationProviderClient mFusedLocationClient;
 
 
     @Override
@@ -69,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
         }
     }
 
+    //WeatherDetailFragment buttons handling
     @Override
     public void onButtonPressed(int button) {
         switch (button) {
@@ -90,9 +112,14 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
             case WeatherDetailFragment.BUTTON_SYNC:
                 startUpdateService();
                 break;
+            case WeatherDetailFragment.BUTTON_PLACE:
+                startDialog();
+                break;
         }
     }
 
+
+    //CITY SELECTION RESULT HANDLING
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == CITY_AUTOCOMPLETE_REQUEST_CODE) {
@@ -116,6 +143,46 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
         }
     }
 
+    //DIALOG HANDLING
+    @Override
+    public void onDialogButtonClick(int button) {
+        switch (button) {
+            case DialogInterface.BUTTON_POSITIVE:
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                        Toast.makeText(this, "Access to this device location needed to continue", Toast.LENGTH_SHORT).show();
+                    } else {
+                        ActivityCompat.requestPermissions(this,
+                                new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
+                                PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                } else {
+                    processDeviceLocation();
+                }
+                break;
+            case DialogInterface.BUTTON_NEGATIVE:
+                Toast.makeText(this, "Continue using current location settings", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION:
+                if(grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    processDeviceLocation();
+                } else {
+                    Toast.makeText(this, "Permission denied. You can add it later in your device settings", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
+    //CUSTOM METHODS
     private void startUpdateService() {
         Intent intent = new Intent(this, UpdateRoomService.class);
         String cityName = mSharedPreferences.getString(getString(R.string.city_name_key),
@@ -128,5 +195,41 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
         intent.putExtra(EXTRA_CITY_LAT, lat);
         intent.putExtra(EXTRA_CITY_LON, lon);
         startService(intent);
+    }
+
+    private void startDialog() {
+        DialogFragment dialog = new LocationDialog();
+        dialog.show(getSupportFragmentManager(), "dialog");
+    }
+
+    private void processDeviceLocation() {
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (null != location) {
+                            String placeName;
+                            double lat = location.getLatitude();
+                            double lon = location.getLongitude();
+
+                            Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                            try {
+                                List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                                if (addresses.size() > 0) {
+                                    placeName = addresses.get(0).getLocality();
+                                    Intent intent = new Intent(MainActivity.this, UpdateRoomService.class);
+                                    intent.putExtra(EXTRA_CITY_NAME, placeName);
+                                    intent.putExtra(EXTRA_CITY_LAT, (float) lat);
+                                    intent.putExtra(EXTRA_CITY_LON, (float) lon);
+                                    Log.e("--processDeviceLocation", "new lat = " + lat + ", new lon = " + lon + ", new pla" +
+                                            " name = " + placeName);
+                                    startService(intent);
+                                }
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this, "Problems with getting location", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
     }
 }
