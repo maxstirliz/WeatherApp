@@ -150,12 +150,12 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                             Manifest.permission.ACCESS_COARSE_LOCATION)) {
                         Toast.makeText(this, R.string.access_needed, Toast.LENGTH_SHORT).show();
                     } else {
                         ActivityCompat.requestPermissions(this,
-                                new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                                 PERMISSION_REQUEST_COARSE_LOCATION);
                     }
                 } else {
@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements WeatherDetailFrag
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION:
-                if(grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     processDeviceLocation();
                 } else {
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
