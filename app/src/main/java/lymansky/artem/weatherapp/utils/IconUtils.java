@@ -44,45 +44,47 @@ public class IconUtils {
 
         switch (icon) {
             case CLEAR_DAY:
-                iconResource = isSelected ? R.drawable.ic_blue_day_bright : R.drawable.ic_black_day_bright;
+                iconResource = isSelected ? R.drawable.ic_01d_blue : R.drawable.ic_01d_black;
                 break;
             case CLEAR_NIGHT:
-                iconResource = isSelected ? R.drawable.ic_blue_night_bright : R.drawable.ic_black_night_bright;
+                iconResource = isSelected ? R.drawable.ic_01n_blue : R.drawable.ic_01n_black;
                 break;
             case CLOUDY_DAY:
-            case SCAT_CLOUDS_DAY:
-            case BROKEN_CLOUDS_DAY:
-            case SNOW_DAY:
-            case MIST_DAY:
-                iconResource = isSelected ? R.drawable.ic_blue_day_cloudy : R.drawable.ic_black_day_cloudy;
+                iconResource = isSelected ? R.drawable.ic_02d_blue : R.drawable.ic_02d_black;
                 break;
-            case MIST_NIGHT:
-            case CLOUDY_NIGHT:
+            case SCAT_CLOUDS_DAY:
             case SCAT_CLOUDS_NIGHT:
+                iconResource = isSelected ? R.drawable.ic_03dn_blue : R.drawable.ic_03dn_black;
+                break;
+            case BROKEN_CLOUDS_DAY:
             case BROKEN_CLOUDS_NIGHT:
+                iconResource = isSelected ? R.drawable.ic_04dn_blue : R.drawable.ic_04dn_black;
+                break;
+            case SNOW_DAY:
             case SNOW_NIGHT:
-                iconResource = isSelected ? R.drawable.ic_blue_night_cloudy : R.drawable.ic_black_night_cloudy;
+                iconResource = isSelected ? R.drawable.ic_13dn_blue : R.drawable.ic_13dn_black;
+                break;
+            case MIST_DAY:
+            case MIST_NIGHT:
+                iconResource = isSelected ? R.drawable.ic_50dn_blue : R.drawable.ic_50dn_black;
+                break;
+            case CLOUDY_NIGHT:
+                iconResource = isSelected ? R.drawable.ic_02n_blue : R.drawable.ic_02n_black;
                 break;
             case SHOWER_DAY:
-                iconResource = isSelected ? R.drawable.ic_blue_day_shower : R.drawable.ic_black_day_shower;
-                break;
             case SHOWER_NIGHT:
-                iconResource = isSelected ? R.drawable.ic_blue_night_shower : R.drawable.ic_black_night_shower;
+                iconResource = isSelected ? R.drawable.ic_09dn_blue : R.drawable.ic_09dn_black;
                 break;
             case RAIN_DAY:
-                iconResource = isSelected ? R.drawable.ic_blue_day_rain : R.drawable.ic_black_day_rain;
-                break;
             case RAIN_NIGHT:
-                iconResource = isSelected ? R.drawable.ic_blue_night_rain : R.drawable.ic_black_night_rain;
+                iconResource = isSelected ? R.drawable.ic_10dn_blue : R.drawable.ic_10dn_black;
                 break;
             case THUNDER_DAY:
-                iconResource = isSelected ? R.drawable.ic_blue_day_thunder : R.drawable.ic_black_day_thunder;
-                break;
             case THUNDER_NIGHT:
-                iconResource = isSelected ? R.drawable.ic_blue_night_rain : R.drawable.ic_black_night_rain;
+                iconResource = isSelected ? R.drawable.ic_11dn_blue : R.drawable.ic_11dn_black;
                 break;
             default:
-                iconResource = isSelected ? R.drawable.ic_blue_day_cloudy : R.drawable.ic_black_day_cloudy;
+                iconResource = isSelected ? R.drawable.ic_02d_blue : R.drawable.ic_02d_black;
                 break;
         }
         return iconResource;
@@ -93,45 +95,47 @@ public class IconUtils {
 
         switch (icon) {
             case CLEAR_DAY:
-                iconResource = R.drawable.ic_white_day_bright;
+                iconResource = R.drawable.ic_01d;
                 break;
             case CLEAR_NIGHT:
-                iconResource = R.drawable.ic_white_night_bright;
+                iconResource = R.drawable.ic_01n;
                 break;
             case CLOUDY_DAY:
-            case SCAT_CLOUDS_DAY:
-            case BROKEN_CLOUDS_DAY:
-            case SNOW_DAY:
-            case MIST_DAY:
-                iconResource = R.drawable.ic_white_day_cloudy;
+                iconResource = R.drawable.ic_02d;
                 break;
-            case MIST_NIGHT:
-            case CLOUDY_NIGHT:
+            case SCAT_CLOUDS_DAY:
             case SCAT_CLOUDS_NIGHT:
+                iconResource = R.drawable.ic_03dn;
+                break;
+            case BROKEN_CLOUDS_DAY:
             case BROKEN_CLOUDS_NIGHT:
+                iconResource = R.drawable.ic_04dn;
+                break;
+            case SNOW_DAY:
             case SNOW_NIGHT:
-                iconResource = R.drawable.ic_white_night_cloudy;
+                iconResource = R.drawable.ic_13dn;
+                break;
+            case MIST_DAY:
+            case MIST_NIGHT:
+                iconResource = R.drawable.ic_50dn;
+                break;
+            case CLOUDY_NIGHT:
+                iconResource = R.drawable.ic_02n;
                 break;
             case SHOWER_DAY:
-                iconResource = R.drawable.ic_white_day_shower;
-                break;
             case SHOWER_NIGHT:
-                iconResource = R.drawable.ic_white_night_shower;
+                iconResource = R.drawable.ic_09dn;
                 break;
             case RAIN_DAY:
-                iconResource = R.drawable.ic_white_day_rain;
-                break;
             case RAIN_NIGHT:
-                iconResource = R.drawable.ic_white_night_rain;
+                iconResource = R.drawable.ic_10dn;
                 break;
             case THUNDER_DAY:
-                iconResource = R.drawable.ic_white_day_thunder;
-                break;
             case THUNDER_NIGHT:
-                iconResource = R.drawable.ic_white_night_rain;
+                iconResource = R.drawable.ic_11dn;
                 break;
             default:
-                iconResource = R.drawable.ic_white_day_cloudy;
+                iconResource = R.drawable.ic_02d;
                 break;
         }
         return iconResource;

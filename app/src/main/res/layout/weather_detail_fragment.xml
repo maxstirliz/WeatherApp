@@ -72,7 +72,7 @@
         android:layout_marginRight="24dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/tv_full_date"
-        tools:background="@drawable/ic_white_day_cloudy" />
+        tools:background="@drawable/ic_11dn" />
 
     <ImageView
         android:id="@+id/ic_temperature"

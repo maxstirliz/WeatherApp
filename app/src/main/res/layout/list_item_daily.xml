@@ -30,7 +30,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="@drawable/ic_black_night_rain" />
+        tools:background="@drawable/ic_04dn_black" />
 
     <TextView
         android:id="@+id/tv_temp_daily"
